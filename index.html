@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMR Checker (Browser Edition)</title>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 2rem; line-height: 1.5; }
+        .control-group { margin-bottom: 1rem; padding: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+        label { display: block; margin-bottom: 0.5rem; }
+        button { padding: 0.5rem 1rem; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        #logs { white-space: pre-wrap; background: #f4f4f4; padding: 1rem; margin-top: 1rem; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+
+    <h1>OMRChecker</h1>
+
+    <div class="control-group">
+        <label for="inputDir"><strong>Input Directory (Select Files):</strong></label>
+        <input type="file" id="inputDir" multiple webkitdirectory>
+        <small>Select a folder containing images.</small>
+    </div>
+
+    <div class="control-group">
+        <strong>Options:</strong>
+        
+        <label>
+            <input type="checkbox" id="debug" checked> Enable Debug Mode
+        </label>
+
+        <label>
+            <input type="checkbox" id="autoAlign"> Auto Align (Experimental)
+        </label>
+
+        <label>
+            <input type="checkbox" id="setLayout"> Set Layout Mode
+        </label>
+    </div>
+
+    <button id="runBtn">Run OMR Checker</button>
+
+    <h3>Console Output:</h3>
+    <div id="logs"></div>
+
+    <script type="module" src="./app.js"></script>
+</body>
+</html>

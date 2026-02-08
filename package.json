@@ -1,0 +1,31 @@
+{
+  "name": "@armghan3071/omrchecker",
+  "version": "1.0.0",
+  "description": "",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/omr-checker.umd.js",
+  "module": "./dist/omr-checker.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/omr-checker.mjs",
+      "require": "./dist/omr-checker.umd.js"
+    }
+  },  
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@techstark/opencv-js": "^4.12.0-release.1"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1",
+    "vite-plugin-webworker-service": "^1.1.0"
+  }
+}

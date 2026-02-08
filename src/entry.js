@@ -2,7 +2,7 @@
  * src/entry.js
  * Complete Port: Exclusion, Multi-Marked, Errors, and Stats
  */
-import { logger } from './logger.js';
+import logger from './logger.js';
 import { CONFIG_DEFAULTS } from './defaults/config.js';
 import { Template } from './template.js';
 import { EvaluationConfig, evaluate_concatenated_response } from './evaluation.js';

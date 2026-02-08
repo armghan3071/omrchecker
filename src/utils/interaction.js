@@ -2,7 +2,7 @@
  * src/utils/interaction.js
  * Replaces interaction.py
  */
-import { logger } from '../logger.js';
+import logger from '../logger.js';
 import { ImageUtils } from './image.js';
 
 export class InteractionUtils {

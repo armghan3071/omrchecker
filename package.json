@@ -5,13 +5,15 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/omr-checker.umd.js",
-  "module": "./dist/omr-checker.mjs",
+  "main": "./dist/omr-checker.umd.cjs",
+  "module": "./dist/omr-checker.js",
   "exports": {
     ".": {
-      "import": "./dist/omr-checker.mjs",
-      "require": "./dist/omr-checker.umd.js"
-    }
+      "import": "./dist/omr-checker.js",
+      "require": "./dist/omr-checker.umd.cjs"
+    },
+    "./app": "./dist/omr-checker.js",
+    "./app.js": "./dist/omr-checker.js"
   },  
   "scripts": {
     "dev": "vite",
@@ -20,7 +22,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@techstark/opencv-js": "^4.12.0-release.1"
   },

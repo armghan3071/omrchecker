@@ -2,7 +2,7 @@
  * src/evaluation.js
  * Replaces evaluation.py
  */
-import { logger } from './logger.js';
+import logger from './logger.js';
 import { 
     BONUS_SECTION_PREFIX, 
     DEFAULT_SECTION_KEY, 

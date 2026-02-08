@@ -2,7 +2,7 @@
  * src/utils/file.js
  * Strict port of file.py
  */
-import { logger } from '../logger.js';
+import logger from '../logger.js';
 
 // Global VFS State
 export const VFS = {

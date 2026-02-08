@@ -1,7 +1,7 @@
 /**
  * src/utils/validations.js
  */
-import { logger } from '../logger.js';
+import logger from '../logger.js';
 
 // Mocks for schema validation (since Ajv/jsonschema is heavy)
 // In a full implementation, you would use 'ajv' here.

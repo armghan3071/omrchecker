@@ -26,11 +26,11 @@ export const FIELD_TYPES = {
     },
 };
 
-// UI Colors
-export const CLR_BLACK = new cv.Scalar(50, 150, 150, 255);
-export const CLR_WHITE = new cv.Scalar(250, 250, 250, 255);
-export const CLR_GRAY = new cv.Scalar(130, 130, 130, 255);
-export const CLR_DARK_GRAY = new cv.Scalar(100, 100, 100, 255);
+// UI Colors (Getters to avoid premature cv access)
+export const get_CLR_BLACK = () => new cv.Scalar(50, 150, 150, 255);
+export const get_CLR_WHITE = () => new cv.Scalar(250, 250, 250, 255);
+export const get_CLR_GRAY = () => new cv.Scalar(130, 130, 130, 255);
+export const get_CLR_DARK_GRAY = () => new cv.Scalar(100, 100, 100, 255);
 export const TEXT_SIZE = 0.95;
 
 export const GLOBAL_PAGE_THRESHOLD_WHITE = 200;

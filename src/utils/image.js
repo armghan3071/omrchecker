@@ -2,7 +2,7 @@
  * src/utils/image.js
  * Strict port of image.py + JS Memory Registry
  */
-import { logger } from '../logger.js';
+import logger from '../logger.js';
 
 export const CLAHE_HELPER = {
     apply: (mat) => {

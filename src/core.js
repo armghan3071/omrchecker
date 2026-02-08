@@ -4,8 +4,8 @@
  */
 import { ImageUtils, CLAHE_HELPER } from './utils/image.js';
 import { InteractionUtils } from './utils/interaction.js';
-import { logger } from './logger.js';
-import { CLR_BLACK, CLR_GRAY, CLR_DARK_GRAY, TEXT_SIZE } from './constants.js';
+import logger from './logger.js';
+import { get_CLR_BLACK, get_CLR_GRAY, get_CLR_DARK_GRAY, TEXT_SIZE } from './constants.js';
 
 export class ImageInstanceOps {
     constructor(tuningConfig) {
@@ -265,13 +265,13 @@ export class ImageInstanceOps {
                         detectedBubbles.push(bubble);
                         cv.rectangle(finalMarked, new cv.Point(x + boxW/12, y + boxH/12), 
                                      new cv.Point(x + boxW - boxW/12, y + boxH - boxH/12), 
-                                     CLR_DARK_GRAY, 3);
+                                     get_CLR_DARK_GRAY(), 3);
                         cv.putText(finalMarked, String(bubble.field_value), new cv.Point(x, y), 
                                    cv.FONT_HERSHEY_SIMPLEX, TEXT_SIZE, new cv.Scalar(20, 20, 10, 255), 2);
                     } else {
                         cv.rectangle(finalMarked, new cv.Point(x + boxW/10, y + boxH/10),
                                      new cv.Point(x + boxW - boxW/10, y + boxH - boxH/10),
-                                     CLR_GRAY, -1);
+                                     get_CLR_GRAY(), -1);
                     }
                     totalQBoxNo++;
                 }
@@ -329,9 +329,9 @@ export class ImageInstanceOps {
             const shift = block.shift;
 
             if (shifted) {
-                cv.rectangle(finalAlign, new cv.Point(sX + shift, sY), new cv.Point(sX + shift + dX, sY + dY), CLR_BLACK, 3);
+                cv.rectangle(finalAlign, new cv.Point(sX + shift, sY), new cv.Point(sX + shift + dX, sY + dY), get_CLR_BLACK(), 3);
             } else {
-                cv.rectangle(finalAlign, new cv.Point(sX, sY), new cv.Point(sX + dX, sY + dY), CLR_BLACK, 3);
+                cv.rectangle(finalAlign, new cv.Point(sX, sY), new cv.Point(sX + dX, sY + dY), get_CLR_BLACK(), 3);
             }
 
             for (const bubbleRow of block.traverse_bubbles) {
@@ -342,13 +342,13 @@ export class ImageInstanceOps {
                     const pt1 = new cv.Point(Math.floor(x + boxW / 10), Math.floor(y + boxH / 10));
                     const pt2 = new cv.Point(Math.floor(x + boxW - boxW / 10), Math.floor(y + boxH - boxH / 10));
                     
-                    cv.rectangle(finalAlign, pt1, pt2, CLR_GRAY, border);
+                    cv.rectangle(finalAlign, pt1, pt2, get_CLR_GRAY(), border);
                 }
             }
 
             if (shifted) {
                 const textPt = new cv.Point(Math.floor(sX + dX - 50), Math.floor(sY - 10));
-                cv.putText(finalAlign, block.name, textPt, cv.FONT_HERSHEY_SIMPLEX, TEXT_SIZE, CLR_BLACK, 4);
+                cv.putText(finalAlign, block.name, textPt, cv.FONT_HERSHEY_SIMPLEX, TEXT_SIZE, get_CLR_BLACK(), 4);
             }
         }
         return finalAlign;

@@ -5,7 +5,7 @@
 import { ImageInstanceOps } from './core.js';
 import { FIELD_TYPES } from './constants.js';
 import { PROCESSOR_MANAGER } from './processors/index.js';
-import { logger } from './logger.js';
+import logger from './logger.js';
 import { parse_fields, custom_sort_output_columns } from './utils/parsing.js';
 
 export class Template {

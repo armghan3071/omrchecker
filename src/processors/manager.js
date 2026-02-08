@@ -1,4 +1,4 @@
-import { logger } from '../logger.js'; // Assuming you will provide logger.js
+import logger from '../logger.js'; // Assuming you will provide logger.js
 
 // Base Processor Class
 export class Processor {

@@ -1,7 +1,10 @@
 import cv from '@techstark/opencv-js';
 import { process_dir } from './entry.js';
 import { VFS } from './utils/file.js';
-import { logger } from './logger.js';
+import logger from './logger.js';
+
+// Expose cv to global scope for other modules
+self.cv = cv;
 
 // Setup CV
 let cvReady = false;
@@ -44,12 +47,14 @@ self.onmessage = async (e) => {
             });
 
             // Gather Results
+            logger.info("Gathering results...");
             const results = {};
             for (const [path, content] of VFS.files.entries()) {
                 if (path.startsWith('outputs/') && path.endsWith('.csv')) {
                     results[path] = content;
                 }
             }
+            logger.info("Processing complete. Sending results to main thread.");
             self.postMessage({ type: 'DONE', payload: results });
 
         } catch (error) {

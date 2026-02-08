@@ -2,7 +2,7 @@
  * src/processors/CropOnMarkers.js
  * Robust Version: Includes Geometry Guard to prevent distortion
  */
-import { logger } from '../logger.js';
+import logger from '../logger.js';
 import { ImagePreprocessor } from './manager.js';
 import { ImageUtils } from '../utils/image.js';
 import { InteractionUtils } from '../utils/interaction.js';

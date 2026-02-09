@@ -3,6 +3,7 @@
  * Strict port of image.py + JS Memory Registry
  */
 import logger from '../logger.js';
+import { VFS } from './file.js';
 
 export const CLAHE_HELPER = {
     apply: (mat) => {
@@ -24,7 +25,70 @@ export class ImageUtils {
     }
 
     static async get_image_by_name(name) {
-        return this.loadedImages.get(name);
+        // 1. Check Memory Cache
+        if (this.loadedImages.has(name)) {
+            return this.loadedImages.get(name);
+        }
+
+        // 2. Check VFS and Decode
+        if (VFS.files.has(name)) {
+            const content = VFS.files.get(name);
+            // Don't try to decode if it's clearly a string (config/template)
+            if (typeof content === 'string') return null;
+
+            try {
+                // Decode using OffscreenCanvas (Worker Compatible)
+                const bitmap = await createImageBitmap(content);
+                const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(bitmap, 0, 0);
+                const imgData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+                const mat = cv.matFromImageData(imgData);
+                
+                // Cleanup
+                // bitmap.close(); // Implicit in some envs, explicit in others
+                
+                this.register_file(name, mat);
+                logger.info(`Decoded and loaded image: ${name}`);
+                return mat;
+            } catch (e) {
+                logger.error(`Failed to load image '${name}' from VFS: ${e.message}`);
+                return null;
+            }
+        }
+        
+        return null;
+    }
+
+    static async matToBase64(mat) {
+        if (!mat || mat.isDeleted()) return null;
+
+        const rgba = new cv.Mat();
+        if (mat.channels() === 1) {
+            cv.cvtColor(mat, rgba, cv.COLOR_GRAY2RGBA);
+        } else if (mat.channels() === 3) {
+            cv.cvtColor(mat, rgba, cv.COLOR_BGR2RGBA);
+        } else {
+            mat.copyTo(rgba);
+        }
+
+        const imgData = new ImageData(
+            new Uint8ClampedArray(rgba.data),
+            rgba.cols,
+            rgba.rows
+        );
+        rgba.delete();
+
+        const canvas = new OffscreenCanvas(imgData.width, imgData.height);
+        const ctx = canvas.getContext('2d');
+        ctx.putImageData(imgData, 0, 0);
+        
+        const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.8 });
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+        });
     }
     // --------------------------------------
 

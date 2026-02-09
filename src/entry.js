@@ -26,6 +26,7 @@ export async function process_dir(rootDir, currDir, args) {
     let template = null;
     const localTemplatePath = `${currDir}/template.json`;
     if (VFS.files.has(localTemplatePath)) {
+        
         const templateJson = JSON.parse(VFS.files.get(localTemplatePath));
         templateJson._path = localTemplatePath; 
         template = new Template(templateJson, tuningConfig);
@@ -90,7 +91,8 @@ export async function process_dir(rootDir, currDir, args) {
     // 5. Setup Outputs & Run
     if (args.setLayout) {
         logger.info("--- Running in SET LAYOUT Mode ---");
-        await show_template_layouts(imageFiles, template, tuningConfig);
+        const results = await show_template_layouts(imageFiles, template, tuningConfig);
+        return results;
     } else {
         const relativeDir = currDir.replace(rootDir, '').replace(/^\//, '');
         const outputDir = `${args.output_dir}/${relativeDir}`;
@@ -99,13 +101,15 @@ export async function process_dir(rootDir, currDir, args) {
         setup_dirs_for_paths(paths);
         const outputsNs = setup_outputs_for_template(paths, template);
 
-        await process_files(imageFiles, template, tuningConfig, evaluationConfig, outputsNs);
+        const results = await process_files(imageFiles, template, tuningConfig, evaluationConfig, outputsNs);
         
         print_stats(imageFiles.length, tuningConfig);
+        return results;
     }
 }
 
 async function show_template_layouts(files, template, config) {
+    const results = [];
     for (const filePath of files) {
         const fileName = filePath.split('/').pop();
         logger.info(`Generating Layout: ${fileName}`);
@@ -132,16 +136,24 @@ async function show_template_layouts(files, template, config) {
             2      
         );
 
+        const base64 = await ImageUtils.matToBase64(layoutImg);
+        results.push({
+            fileName,
+            layoutImage: base64
+        });
+
         InteractionUtils.show(`Layout: ${fileName}`, layoutImg, { config });
 
         processed.delete();
         layoutImg.delete();
     }
+    return results;
 }
 
 async function process_files(files, template, config, evalConfig, outputsNs) {
     const startTime = Date.now();
     let counter = 0;
+    const results = [];
     
     // Reset global stats
     STATS.files_moved = 0;
@@ -172,6 +184,11 @@ async function process_files(files, template, config, evalConfig, outputsNs) {
             appendToCsv(outputsNs.files_obj["Errors"], errRow);
             
             STATS.files_moved++; // Tracking error files as "moved" out of processing
+            results.push({ 
+                fileName, 
+                error: "Processing Failed", 
+                path: filePath 
+            });
             continue;
         }
         // ------------------------------------------------------
@@ -201,6 +218,15 @@ async function process_files(files, template, config, evalConfig, outputsNs) {
 
         const respArray = template.outputColumns.map(col => omrResponse[col]);
         
+        const resultItem = {
+            fileName,
+            score,
+            response: omrResponse,
+            imagePath: filePath,
+            markedImagePath: `${saveDir}/${fileName}`,
+            multiMarked: false
+        };
+
         // --- MISSING LOGIC: Multi-Marked Handling ---
         if (multi_marked && config.outputs.filter_out_multimarked_files) {
             // Multi-marked case
@@ -212,17 +238,20 @@ async function process_files(files, template, config, evalConfig, outputsNs) {
             appendToCsv(outputsNs.files_obj["MultiMarked"], mmRow);
             
             STATS.files_moved++;
+            resultItem.multiMarked = true;
         } else {
             // Normal case
             STATS.files_not_moved++;
             const row = [fileName, filePath, `${saveDir}/${fileName}`, score, ...respArray];
             appendToCsv(outputsNs.files_obj["Results"], row);
         }
+        results.push(resultItem);
         // ---------------------------------------------
 
         if (final_marked) final_marked.delete();
         if (processed) processed.delete();
     }
+    return results;
 }
 
 // --- MISSING LOGIC: Print Stats ---

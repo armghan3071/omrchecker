@@ -4,6 +4,7 @@ import { ImageUtils } from '../utils/image.js';
 import { InteractionUtils } from '../utils/interaction.js';
 
 export class FeatureBasedAlignment extends ImagePreprocessor {
+    static NAME = "FeatureBasedAlignment"
     constructor(...args) {
         super(...args);
         const options = this.options;

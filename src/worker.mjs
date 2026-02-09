@@ -30,32 +30,55 @@ self.onmessage = async (e) => {
         try {
             VFS.files.clear();
             
+            // Helper to fetch if URL
+            const fetchIfNeeded = async (val) => {
+                if (typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'))) {
+                    try {
+                        const res = await fetch(val);
+                        if (!res.ok) throw new Error(`Failed to fetch ${val}: ${res.statusText}`);
+                        // If it's a JSON file (template), return text. Otherwise blob (marker image)
+                        const contentType = res.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) return res.text();
+                        if (val.endsWith('.json')) return res.text();
+                        return res.blob();
+                    } catch (e) {
+                        logger.error(`Error fetching URL ${val}: ${e.message}`);
+                        throw e;
+                    }
+                }
+                return val;
+            };
+
             // Inject Template
             if (payload.template) {
-                const content = typeof payload.template === 'string' ? payload.template : JSON.stringify(payload.template);
-                VFS.files.set('inputs/template.json', content);
+                let content = await fetchIfNeeded(payload.template);
+                const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
+                VFS.files.set('inputs/template.json', contentStr);
             }
             // Inject Marker
-            if (payload.marker) VFS.files.set('inputs/omr_marker.jpg', payload.marker);
+            if (payload.marker) {
+                 const content = await fetchIfNeeded(payload.marker);
+                 VFS.files.set('inputs/omr_marker.jpg', content);
+            }
             // Inject Images
             payload.files.forEach(f => VFS.files.set(`inputs/${f.name}`, f.content));
 
             // Run
-            await process_dir("inputs", "inputs", { 
+            const processResults = await process_dir("inputs", "inputs", { 
                 output_dir: "outputs", 
                 setLayout: payload.setLayout || false 
             });
 
-            // Gather Results
+            // Gather Results (Legacy CSVs + New JSON)
             logger.info("Gathering results...");
-            const results = {};
+            const vfsFiles = {};
             for (const [path, content] of VFS.files.entries()) {
                 if (path.startsWith('outputs/') && path.endsWith('.csv')) {
-                    results[path] = content;
+                    vfsFiles[path] = content;
                 }
             }
             logger.info("Processing complete. Sending results to main thread.");
-            self.postMessage({ type: 'DONE', payload: results });
+            self.postMessage({ type: 'DONE', payload: processResults });
 
         } catch (error) {
             self.postMessage({ type: 'ERROR', payload: { message: error.message } });

@@ -1,6 +1,7 @@
 import { ImagePreprocessor } from './manager.js';
 
 export class Levels extends ImagePreprocessor {
+    static NAME = "Levels"
     constructor(...args) {
         super(...args);
         
@@ -34,6 +35,7 @@ export class Levels extends ImagePreprocessor {
 }
 
 export class MedianBlur extends ImagePreprocessor {
+    static NAME = "MedianBlur"
     constructor(...args) {
         super(...args);
         this.kSize = parseInt(this.options.kSize || 5);
@@ -47,6 +49,7 @@ export class MedianBlur extends ImagePreprocessor {
 }
 
 export class GaussianBlur extends ImagePreprocessor {
+    static NAME = "GaussianBlur"
     constructor(...args) {
         super(...args);
         const kArr = this.options.kSize || [3, 3];

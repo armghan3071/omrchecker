@@ -14,6 +14,7 @@ const DEFAULT_GAUSSIAN_BLUR_PARAMS_MARKER = { kernel_size: [5, 5], sigma_x: 0 };
 const DEFAULT_NORMALIZE_PARAMS = { alpha: 0, beta: 255 };
 
 export class CropOnMarkers extends ImagePreprocessor {
+    static NAME = "CropOnMarkers";
     constructor(options = {}, relativeDir = null, imageInstanceOps = null) {
         super(options, relativeDir, imageInstanceOps);
         const markerOps = this.options;

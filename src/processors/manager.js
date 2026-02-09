@@ -35,7 +35,7 @@ class ProcessorManager {
 
     // JS cannot "walk" folders. We manually register classes here.
     register(ClassRef) {
-        const name = ClassRef.name;
+        const name = ClassRef.NAME;
         // Avoid registering base classes
         if (name !== 'Processor' && name !== 'ImagePreprocessor') {
             this.processors[name] = ClassRef;

@@ -42,6 +42,7 @@ function checkMaxCosine(approxMat) {
 }
 
 export class CropPage extends ImagePreprocessor {
+    static NAME = "CropPage"
     constructor(options, relativeDir, imageInstanceOps) {
         super(options, relativeDir, imageInstanceOps);
         const k = this.options.morphKernel || [10, 10];

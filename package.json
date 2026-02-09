@@ -1,7 +1,19 @@
 {
   "name": "@armghan3071/omrchecker",
   "version": "1.0.0",
-  "description": "",
+  "description": "High-performance client-side OMR engine using OpenCV.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/armghan3071/omrchecker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/armghan3071/omrchecker/issues"
+  },
+  "homepage": "https://github.com/armghan3071/omrchecker#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "files": [
     "dist"
   ],

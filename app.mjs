@@ -5,8 +5,9 @@
 import WorkerConstructor from './src/worker.mjs?worker&inline';
 
 export class OMRChecker {
-    constructor() {
+    constructor(config = {}) {
         this.worker = null;
+        this.config = config;
         this.onLog = (level, msg) => console.log(`[OMR] ${level}: ${msg}`);
     }
 
@@ -43,13 +44,20 @@ export class OMRChecker {
                 }
             };
 
+            const workerConfig = { ...this.config };
+            if (workerConfig.cv) {
+                workerConfig.opencvAvailable = true;
+                delete workerConfig.cv;
+            }
+
             this.worker.postMessage({
                 command: 'START',
                 payload: {
                     files: images.map(f => ({ name: f.name, content: f })),
                     template,
                     marker,
-                    setLayout
+                    setLayout,
+                    config: workerConfig
                 }
             });
         });

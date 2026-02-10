@@ -1,33 +1,90 @@
-import cv from '@techstark/opencv-js';
 import { process_dir } from './entry.js';
 import { VFS } from './utils/file.js';
 import logger from './logger.js';
-
-// Expose cv to global scope for other modules
-self.cv = cv;
-
-// Setup CV
-let cvReady = false;
-cv.onRuntimeInitialized = () => { cvReady = true; };
 
 // Setup Logger
 logger.setCallback((level, message) => {
     self.postMessage({ type: 'LOG', payload: { level, message } });
 });
 
-self.onmessage = async (e) => {
-    // Wait for OpenCV
-    if (!cvReady) {
-        await new Promise(resolve => {
-            const check = setInterval(() => {
-                if (cvReady) { clearInterval(check); resolve(); }
-            }, 50);
-        });
+let cvReady = false;
+const CV_URL = 'https://cdn.jsdelivr.net/npm/@techstark/opencv-js@4.12.0-release.1/dist/opencv.min.js';
+
+async function waitForOpenCV(config) {
+    // 1. Check if explicitly provided (assumed ready or handled externally)
+    if (config && config.opencvAvailable) {
+        if (self.cv) cvReady = true;
+        return;
     }
 
+    // 2. Check if already loaded in global scope
+    if (self.cv) {
+        // Assume it's initializing or ready.
+        if (!cvReady) {
+             // Try to hook or wait
+             await new Promise(r => {
+                 if (self.cv.onRuntimeInitialized) {
+                      const prev = self.cv.onRuntimeInitialized;
+                      self.cv.onRuntimeInitialized = () => { if(prev) prev(); r(); };
+                 } else {
+                      // Poll
+                      const i = setInterval(() => {
+                          try { 
+                              if (self.cv.Mat) {
+                                clearInterval(i); 
+                                r(); 
+                              }
+                          } catch(e){}
+                      }, 50);
+                 }
+             });
+             cvReady = true;
+        }
+        return;
+    }
+
+    // 3. Load from CDN
+    logger.info("Loading OpenCV from CDN...");
+    importScripts(CV_URL);
+    
+    // 4. Wait for initialization
+    await new Promise((resolve) => {
+        // If the script loaded, cv should be defined.
+        if (!self.cv) {
+            // Should not happen if importScripts succeeded
+             resolve(); 
+             return; 
+        }
+
+        if (!self.cv.onRuntimeInitialized) {
+             self.cv.onRuntimeInitialized = resolve;
+             
+             // Fallback poll
+             const i = setInterval(() => {
+                 if (self.cv.Mat) { clearInterval(i); resolve(); }
+             }, 100);
+        } else {
+            // If it was already set? 
+            // Usually opencv.js checks if onRuntimeInitialized is defined and calls it when ready.
+            // If we set it now, it might be too late if it's already ready?
+            // So we poll too.
+             const i = setInterval(() => {
+                 if (self.cv.Mat) { clearInterval(i); resolve(); }
+             }, 100);
+        }
+    });
+    cvReady = true;
+    logger.info("OpenCV Initialized.");
+}
+
+self.onmessage = async (e) => {
     const { command, payload } = e.data;
     if (command === 'START') {
         try {
+            await waitForOpenCV(payload.config);
+
+            if (!self.cv) throw new Error("OpenCV failed to load. Please check network or config.");
+
             VFS.files.clear();
             
             // Helper to fetch if URL

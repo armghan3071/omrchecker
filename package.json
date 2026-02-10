@@ -25,7 +25,7 @@
     },
     "./app": "./dist/omr-checker.js",
     "./app.js": "./dist/omr-checker.js"
-  },  
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build"
@@ -34,9 +34,6 @@
   "author": "",
   "license": "ISC",
   "type": "module",
-  "dependencies": {
-    "@techstark/opencv-js": "^4.12.0-release.1"
-  },
   "devDependencies": {
     "vite": "^7.3.1",
     "vite-plugin-webworker-service": "^1.1.0"

@@ -227,6 +227,10 @@ async function process_files(files, template, config, evalConfig, outputsNs) {
             multiMarked: false
         };
 
+        if (config.includeOutputImages && final_marked) {
+            resultItem.markedImage = await ImageUtils.matToBase64(final_marked);
+        }
+
         // --- MISSING LOGIC: Multi-Marked Handling ---
         if (multi_marked && config.outputs.filter_out_multimarked_files) {
             // Multi-marked case

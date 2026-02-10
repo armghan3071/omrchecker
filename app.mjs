@@ -7,7 +7,10 @@ import WorkerConstructor from './src/worker.mjs?worker&inline';
 export class OMRChecker {
     constructor(config = {}) {
         this.worker = null;
-        this.config = config;
+        this.config = config || {
+            cv: null,
+            includeOutputImages: false
+        };
         this.onLog = (level, msg) => console.log(`[OMR] ${level}: ${msg}`);
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "@armghan3071/omrchecker",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "High-performance client-side OMR engine using OpenCV.js",
   "repository": {
     "type": "git",

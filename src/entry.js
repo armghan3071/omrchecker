@@ -101,7 +101,7 @@ export async function process_dir(rootDir, currDir, args) {
         setup_dirs_for_paths(paths);
         const outputsNs = setup_outputs_for_template(paths, template);
 
-        const results = await process_files(imageFiles, template, tuningConfig, evaluationConfig, outputsNs);
+        const results = await process_files(imageFiles, template, tuningConfig, evaluationConfig, outputsNs, args.includeOutputImages);
         
         print_stats(imageFiles.length, tuningConfig);
         return results;
@@ -150,7 +150,7 @@ async function show_template_layouts(files, template, config) {
     return results;
 }
 
-async function process_files(files, template, config, evalConfig, outputsNs) {
+async function process_files(files, template, config, evalConfig, outputsNs, includeImages = false) {
     const startTime = Date.now();
     let counter = 0;
     const results = [];
@@ -226,8 +226,7 @@ async function process_files(files, template, config, evalConfig, outputsNs) {
             markedImagePath: `${saveDir}/${fileName}`,
             multiMarked: false
         };
-
-        if (config.includeOutputImages && final_marked) {
+        if (includeImages && final_marked) {
             resultItem.markedImage = await ImageUtils.matToBase64(final_marked);
         }
 

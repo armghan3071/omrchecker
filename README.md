@@ -15,42 +15,8 @@ A powerful, client-side Optical Mark Recognition (OMR) engine for JavaScript. Pr
 ```sh
 npm install @armghan3071/omrchecker
 ```
-### ⚠️ Critical Setup: The Web Worker
 
-Because this library runs heavy image processing logic in a background thread, you must make the worker file accessible to the browser via a URL.
-
-#### 1. Copy the Worker File
-After installing, you must copy the worker file from `node_modules` to your project's **Public/Static** folder.
-
-- **Source:** `node_modules/@armghan3071/omrchecker/dist/worker.mjs`
-- **Destination:** Your project's public folder (e.g., `public/omr-worker.js`).
-
-| Framework | Destination Folder |
-| :--- | :--- |
-| **Quasar / Vue** | `public/omr-worker.js` |
-| **Vite** | `public/omr-worker.js` |
-| **React (CRA)** | `public/omr-worker.js` |
-| **Next.js** | `public/omr-worker.js` |
-
-#### 2. Automate it (Recommended)
-Add a script to your project's `package.json` to copy this file automatically whenever you install dependencies.
-
-**Linux / Mac:**
-```json
-"scripts": {
-  "postinstall": "cp node_modules/@armghan3071/omrchecker/dist/worker.mjs public/omr-worker.js"
-}
-```
-
-**Windows:**
-```json
-"scripts": {
-  "postinstall": "copy node_modules\\@armghan3071\\omrchecker\\dist\\worker.mjs public\\omr-worker.js""copy node_modules\\@armghan3071\\omrchecker\\dist\\worker.mjs public\\omr-worker.js"
-}
-```
-
-
-#### 2. Vanilla JS Example
+#### Vanilla JS Example
 
 ```javascript
 import { OMRChecker } from '@armghan3071/omrchecker';
@@ -72,8 +38,10 @@ document.getElementById('scanBtn').addEventListener('click', async () => {
 
 ### API Reference
 
-#### `new OMRChecker(workerUrl)`
-- **workerUrl** `(string)`: The absolute URL path to the `omr-worker.js` file on your server (e.g., `/omr-worker.js`).
+#### `new OMRChecker(config = {})`
+- **config** `(Object)`: Optional configuration object.
+    - `cv`: If you are using Open CV in your existing project
+    - `includeOutputImages:`: True if you want to include markedImage during grading section
 
 #### `async process(files, template, marker, setLayout)`
 - **files** `(File[])`: Array of browser `File` objects (images).
@@ -92,26 +60,50 @@ The `template.json` defines where the engine should look for bubbles.
 
 ```json
 {
-  "pageDimensions": [1200, 1700],
-  "bubbleDimensions": [30, 30],
-  "preProcessors": [
-    { 
-        "name": "CropPage", 
-        "options": { "morphKernel": [5, 5] } 
-    },
-    { 
-        "name": "CropOnMarkers", 
-        "options": { 
-            "relativePath": "omr_marker.jpg",
-            "min_matching_threshold": 0.5 
-        } 
-    }
+  "pageDimensions": [
+    1189,
+    1682
   ],
-  "fields": {
-     "roll_number": { "type": "grid", "xy": [100, 200], "cols": 5, "rows": 10 },
-     "q1": { "type": "bubble", "xy": [100, 500], "label": "A" }
+  "bubbleDimensions": [
+    30,
+    30
+  ],
+  "preProcessors": [
+    {
+      "name": "CropPage",
+      "options": {
+        "morphKernel": [
+          10,
+          10
+        ]
+      }
+    },
+    {
+  "name": "CropOnMarkers",
+  "options": {
+    "relativePath": "omr_marker.jpg",
+    "sheetToMarkerWidthRatio": 17,     
+    "min_matching_threshold": 0.3,
+    "marker_rescale_range": [20, 100]      
   }
 }
+  ],
+  "fieldBlocks": {
+    "MCQBlock1": {
+      "fieldType": "QTYPE_MCQ4",
+      "origin": [
+        134,
+        684
+      ],
+      "fieldLabels": [
+        "q1..11"
+      ],
+      "bubblesGap": 79,
+      "labelsGap": 62
+    }
+  }
+}
+
 ```
 
 ### Credits & References

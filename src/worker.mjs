@@ -123,7 +123,8 @@ self.onmessage = async (e) => {
             // Run
             const processResults = await process_dir("inputs", "inputs", { 
                 output_dir: "outputs", 
-                setLayout: payload.setLayout || false 
+                setLayout: payload.setLayout || false,
+                includeOutputImages: payload.config.includeOutputImages || false
             });
 
             // Gather Results (Legacy CSVs + New JSON)
